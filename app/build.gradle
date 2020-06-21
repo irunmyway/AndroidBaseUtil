@@ -23,9 +23,7 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':utils')
-//    implementation 'androidx.recyclerview:recyclerview:1.0.0'
-//    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-//    implementation 'androidx.appcompat:appcompat:1.0.0'
-    compile 'com.android.support:appcompat-v7:25.3.1'//版本 23以上（必须）
-    compile "com.android.support:leanback-v17:+"
+    implementation 'androidx.recyclerview:recyclerview:1.0.0'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.appcompat:appcompat:1.0.0'
 }
