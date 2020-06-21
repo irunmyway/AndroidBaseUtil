@@ -11,6 +11,13 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
+    compileOptions {
+//        encoding "utf-8"
+//        encoding "gbk"
+        sourceCompatibility = 1.7
+        targetCompatibility = 1.7
+
+    }
 }
 
 dependencies {
