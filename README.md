@@ -1,4 +1,4 @@
-# changes
+# 简单食用
 
 ## 详细示例见本项目app下的MainActivity
 一个listAdapter只需要如下几行
