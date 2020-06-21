@@ -3,20 +3,13 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion COMPILE_SDK_VERSION
     defaultConfig {
-        applicationId "com.wang.example"
+        applicationId "com.ez.example"
         minSdkVersion MIN_SDK_VERSION
         targetSdkVersion TARGET_SDK_VERSION
         versionCode 101
         versionName "1.01"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-    }
-    compileOptions {
-//        encoding "utf-8"
-//        encoding "gbk"
-        sourceCompatibility = 1.7
-        targetCompatibility = 1.7
-
     }
 }
 
