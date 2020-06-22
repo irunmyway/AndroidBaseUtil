@@ -2,6 +2,7 @@ package com.ez.utils;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -29,6 +30,10 @@ public class BSql {
 
     public static void create(File f) {
         _db = SQLiteDatabase.openOrCreateDatabase(f, null);
+    }
+
+    public static void create(SQLiteOpenHelper f) {
+        _db = f.getWritableDatabase();
     }
 
     public static boolean createTable(String table, HashMap<String, String> values, boolean autokey) {
@@ -188,7 +193,6 @@ public class BSql {
         } catch (Exception e) {
             BDebug.trace("sql query Error: ", e.getMessage());
         }
-
         return list;
     }
 }
