@@ -19,9 +19,9 @@ import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
-
 
 import java.io.DataOutputStream;
 
@@ -128,7 +128,6 @@ public class BSystem {
      * @param showUI 是否显示
      */
     public static void changeVolume(Context context, boolean add, boolean showUI) {
-
         try {
             ((AudioManager) context.getSystemService(Service.AUDIO_SERVICE)).adjustStreamVolume(AudioManager.STREAM_MUSIC,
                     (add ? AudioManager.ADJUST_RAISE : AudioManager.ADJUST_LOWER),
@@ -136,7 +135,6 @@ public class BSystem {
         } catch (Exception e) {
             BDebug.trace("Error changeVolume: ", e.getMessage());
         }
-
     }
 
     public static void changeVolume(Context context, int vol) {
@@ -144,6 +142,18 @@ public class BSystem {
         am.setStreamVolume(AudioManager.STREAM_MUSIC, am.getStreamMaxVolume(AudioManager.STREAM_MUSIC), AudioManager.FLAG_PLAY_SOUND);
         am.getStreamMaxVolume(AudioManager.STREAM_VOICE_CALL);//得到听筒模式的最大值
         am.getStreamVolume(AudioManager.STREAM_VOICE_CALL);
+    }
+
+    // 根据亮度值修改当前window亮度0-255
+    public static void changeAppBrightness(Context context, int brightness) {
+        Window window = ((Activity) context).getWindow();
+        WindowManager.LayoutParams lp = window.getAttributes();
+        if (brightness == -1) {
+            lp.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE;
+        } else {
+            lp.screenBrightness = (brightness <= 0 ? 1 : brightness) / 255f;
+        }
+        window.setAttributes(lp);
     }
 
 

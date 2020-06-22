@@ -1,9 +1,8 @@
 package com.ez.utils;
 
 import android.annotation.SuppressLint;
-
-import androidx.annotation.IntDef;
-import androidx.annotation.NonNull;
+import android.support.annotation.IntDef;
+import android.support.annotation.NonNull;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
