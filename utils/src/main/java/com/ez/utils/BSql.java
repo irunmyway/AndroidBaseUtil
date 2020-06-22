@@ -32,6 +32,7 @@ public class BSql {
         _db = SQLiteDatabase.openOrCreateDatabase(f, null);
     }
 
+    //创建工具类
     public static void create(SQLiteOpenHelper f) {
         _db = f.getWritableDatabase();
     }
