@@ -1,10 +1,11 @@
 package com.ez.easysocket.connection.reconnect;
 
-import com.easysocket.entity.OriginReadData;
-import com.easysocket.entity.SocketAddress;
-import com.easysocket.interfaces.conn.IConnectionManager;
-import com.easysocket.interfaces.conn.IReconnListener;
-import com.easysocket.interfaces.conn.ISocketActionListener;
+
+import com.ez.easysocket.entity.OriginReadData;
+import com.ez.easysocket.entity.SocketAddress;
+import com.ez.easysocket.interfaces.conn.IConnectionManager;
+import com.ez.easysocket.interfaces.conn.IReconnListener;
+import com.ez.easysocket.interfaces.conn.ISocketActionListener;
 
 /**
  * Author：Alex

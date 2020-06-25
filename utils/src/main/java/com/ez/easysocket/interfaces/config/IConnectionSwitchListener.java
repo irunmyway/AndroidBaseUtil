@@ -1,7 +1,8 @@
 package com.ez.easysocket.interfaces.config;
 
-import com.easysocket.entity.SocketAddress;
-import com.easysocket.interfaces.conn.IConnectionManager;
+
+import com.ez.easysocket.entity.SocketAddress;
+import com.ez.easysocket.interfaces.conn.IConnectionManager;
 
 /**
  * Author：Alex

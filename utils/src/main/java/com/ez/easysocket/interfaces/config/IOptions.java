@@ -1,6 +1,6 @@
 package com.ez.easysocket.interfaces.config;
 
-import com.easysocket.config.EasySocketOptions;
+import com.ez.easysocket.config.EasySocketOptions;
 
 /**
  * Author：Alex

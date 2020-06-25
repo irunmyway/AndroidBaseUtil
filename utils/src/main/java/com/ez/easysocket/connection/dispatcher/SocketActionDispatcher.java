@@ -1,10 +1,11 @@
 package com.ez.easysocket.connection.dispatcher;
 
-import com.easysocket.entity.OriginReadData;
-import com.easysocket.entity.SocketAddress;
-import com.easysocket.interfaces.conn.IConnectionManager;
-import com.easysocket.interfaces.conn.ISocketActionDispatch;
-import com.easysocket.interfaces.conn.ISocketActionListener;
+
+import com.ez.easysocket.entity.OriginReadData;
+import com.ez.easysocket.entity.SocketAddress;
+import com.ez.easysocket.interfaces.conn.IConnectionManager;
+import com.ez.easysocket.interfaces.conn.ISocketActionDispatch;
+import com.ez.easysocket.interfaces.conn.ISocketActionListener;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -12,10 +13,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import static com.easysocket.connection.action.IOAction.ACTION_READ_COMPLETE;
-import static com.easysocket.connection.action.SocketAction.ACTION_CONN_FAIL;
-import static com.easysocket.connection.action.SocketAction.ACTION_CONN_SUCCESS;
-import static com.easysocket.connection.action.SocketAction.ACTION_DISCONNECTION;
+import static com.ez.easysocket.connection.action.IOAction.ACTION_READ_COMPLETE;
+import static com.ez.easysocket.connection.action.SocketAction.ACTION_CONN_FAIL;
+import static com.ez.easysocket.connection.action.SocketAction.ACTION_CONN_SUCCESS;
+import static com.ez.easysocket.connection.action.SocketAction.ACTION_DISCONNECTION;
+
 
 /**
  * Author：Alex

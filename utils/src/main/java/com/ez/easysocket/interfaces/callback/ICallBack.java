@@ -1,6 +1,7 @@
 package com.ez.easysocket.interfaces.callback;
 
-import com.easysocket.callback.SuperCallBack;
+
+import com.ez.easysocket.callback.SuperCallBack;
 
 /**
  * Author：Alex

@@ -1,10 +1,11 @@
 package com.ez.easysocket.connection.iowork;
 
-import com.easysocket.config.EasySocketOptions;
-import com.easysocket.interfaces.conn.IConnectionManager;
-import com.easysocket.interfaces.conn.ISocketActionDispatch;
-import com.easysocket.interfaces.io.IWriter;
-import com.easysocket.utils.LogUtil;
+
+import com.ez.easysocket.config.EasySocketOptions;
+import com.ez.easysocket.interfaces.conn.IConnectionManager;
+import com.ez.easysocket.interfaces.conn.ISocketActionDispatch;
+import com.ez.easysocket.interfaces.io.IWriter;
+import com.ez.easysocket.utils.LogUtil;
 
 import java.io.IOException;
 import java.io.OutputStream;

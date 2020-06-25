@@ -1,6 +1,6 @@
 package com.ez.easysocket.entity.basemsg;
 
-import com.easysocket.EasySocket;
+import com.ez.easysocket.EasySocket;
 import com.google.gson.Gson;
 
 import java.nio.ByteBuffer;

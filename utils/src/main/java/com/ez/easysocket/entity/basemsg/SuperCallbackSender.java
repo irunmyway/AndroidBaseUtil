@@ -1,6 +1,7 @@
 package com.ez.easysocket.entity.basemsg;
 
-import com.easysocket.utils.Util;
+
+import com.ez.easysocket.utils.Util;
 
 /**
  * Author：Alex

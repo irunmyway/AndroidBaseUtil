@@ -1,7 +1,8 @@
 package com.ez.easysocket.interfaces.conn;
 
-import com.easysocket.entity.OriginReadData;
-import com.easysocket.entity.SocketAddress;
+
+import com.ez.easysocket.entity.OriginReadData;
+import com.ez.easysocket.entity.SocketAddress;
 
 /**
  * Author：Alex

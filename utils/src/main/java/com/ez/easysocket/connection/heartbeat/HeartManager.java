@@ -1,14 +1,15 @@
 package com.ez.easysocket.connection.heartbeat;
 
-import com.easysocket.config.EasySocketOptions;
-import com.easysocket.entity.OriginReadData;
-import com.easysocket.entity.SocketAddress;
-import com.easysocket.entity.basemsg.SuperSender;
-import com.easysocket.interfaces.config.IOptions;
-import com.easysocket.interfaces.conn.IConnectionManager;
-import com.easysocket.interfaces.conn.IHeartManager;
-import com.easysocket.interfaces.conn.ISocketActionDispatch;
-import com.easysocket.interfaces.conn.ISocketActionListener;
+
+import com.ez.easysocket.config.EasySocketOptions;
+import com.ez.easysocket.entity.OriginReadData;
+import com.ez.easysocket.entity.SocketAddress;
+import com.ez.easysocket.entity.basemsg.SuperSender;
+import com.ez.easysocket.interfaces.config.IOptions;
+import com.ez.easysocket.interfaces.conn.IConnectionManager;
+import com.ez.easysocket.interfaces.conn.IHeartManager;
+import com.ez.easysocket.interfaces.conn.ISocketActionDispatch;
+import com.ez.easysocket.interfaces.conn.ISocketActionListener;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;

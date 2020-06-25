@@ -1,6 +1,7 @@
 package com.ez.easysocket.config;
 
-import com.easysocket.entity.SocketAddress;
+
+import com.ez.easysocket.entity.SocketAddress;
 
 import java.net.Socket;
 

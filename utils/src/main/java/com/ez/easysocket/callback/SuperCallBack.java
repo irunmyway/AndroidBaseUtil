@@ -3,6 +3,7 @@ package com.ez.easysocket.callback;
 
 import com.ez.easysocket.interfaces.callback.IType;
 import com.ez.easysocket.utils.Util;
+import com.google.gson.Gson;
 
 import java.lang.reflect.Type;
 

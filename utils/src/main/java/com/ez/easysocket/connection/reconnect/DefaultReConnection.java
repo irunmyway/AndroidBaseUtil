@@ -1,7 +1,8 @@
 package com.ez.easysocket.connection.reconnect;
 
-import com.easysocket.entity.SocketAddress;
-import com.easysocket.utils.LogUtil;
+
+import com.ez.easysocket.entity.SocketAddress;
+import com.ez.easysocket.utils.LogUtil;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
