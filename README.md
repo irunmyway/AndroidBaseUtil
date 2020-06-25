@@ -90,7 +90,7 @@ allprojects {
 }
 ```
 然后导入
-`implementation（或api） 'com.github.irunmyway:AndroidBaseUtil:1.0.0.3'`
+`implementation（或api） 'com.github.irunmyway:AndroidBaseUtil:1.0.0.2'`
 
 AndroidX：
 `implementation（或api） 'com.github.irunmyway:AndroidBaseUtil:2.0.0.5'`
