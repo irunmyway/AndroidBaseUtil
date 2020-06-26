@@ -1,20 +1,56 @@
+# 提供一些基础工具类，在代码中直接类.方法即可实用
+## 举个栗子
+```
+    // 方法类集合
+    //BDate 日期工具类  BArray 数组工具类   BSql sqlite 工具类  BString 字符串操作类
+    //BObject 元素操作  BFile 文件IO操作
+    //例子
+    Bdebug.trace("hello");
+```
+
+# Socket封装的食用
+## 快速的搞定套接字连接
+```
+    /**
+     * 初始化Socket
+     */
+    private void initSocket() {
+        socketClient = new SocketClient();
+        socketClient.createConnection("49.234.186.237",9123,true);
+        socketClient.setSocketCallback(this).start();
+    }
+    //提供如下的监听回调类 :SocketCallback
+    public interface SocketCallback {
+        //出错
+        void onError(Exception e);
+        //关闭
+        void onClosed(Socket socket);
+        //已连接
+        void onConnected(Socket socket);
+        //连接失败
+        void onConnectFail(Socket socket, boolean needReconnect);
+        //接收
+        void onReceive(Socket socket, ByteArrayOutputStream byteArray);
+    }
+
+
+```
+
+
 # BaseAdapter简单食用
 
 ## 详细示例见本项目app下的MainActivity
 一个listAdapter只需要如下几行
 ```
     public class ListAdapter extends BaseAdapterRvList<BaseViewHolder, String> {
-
         public ListAdapter(@NonNull Activity activity, List<String> list) {
             super(activity, list);
         }
-
         @Override
         protected void onBindVH(BaseViewHolder holder, int listPosition, String s) {
             //当然，你也可以继承BaseViewHolder自己用黄油刀生成
             holder.setText(R.id.text, s).setViewVisible(R.id.text, s == null ? View.GONE : View.VISIBLE);
         }
-
         @NonNull
         @Override
         protected BaseViewHolder onCreateVH(ViewGroup parent, LayoutInflater inflater) {
