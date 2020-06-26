@@ -326,4 +326,14 @@ public class BArray {
         }
         return -1;
     }
+
+    //将byte数组置空
+    public static byte[] resetArray(byte[] a) {
+        byte[] b2 = new byte[a.length];
+        for (int i = 0; i < a.length; i++) {
+            a[i] = b2[i];
+        }
+        return a;
+    }
+
 }

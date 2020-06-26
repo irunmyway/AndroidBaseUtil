@@ -1,6 +1,5 @@
 package com.ez.socket.callback;
 
-import java.io.ByteArrayOutputStream;
 import java.net.Socket;
 
 /**
@@ -22,5 +21,5 @@ public interface SocketCallback {
     void onConnectFail(Socket socket, boolean needReconnect);
 
     //接收
-    void onReceive(Socket socket, ByteArrayOutputStream byteArray);
+    void onReceive(Socket socket, byte[] bytes);
 }

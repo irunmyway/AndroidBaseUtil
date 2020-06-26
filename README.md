@@ -8,18 +8,18 @@
     Bdebug.trace("hello");
 ```
 
-# Socket封装的食用
+# Socket封装的食用 包括心跳设置。
 ## 快速的搞定套接字连接
 ```
     /**
      * 初始化Socket
      */
     private void initSocket() {
-        socketClient = new SocketClient();
-        socketClient.createConnection("49.234.186.237",9123,true);
-        socketClient.setSocketCallback(this).start();
+       socketClient = new SocketClient();
+       socketClient.createConnection("111.111.111",9123,true,true);//允许重连 开启心跳
+        socketClient.setHeartbeatCallback(heartbeatCallback).setSocketCallback(socketLitener).start();
     }
-    //提供如下的监听回调类 :SocketCallback
+    //提供如下的监听回调类 :SocketCallback  :HeartbeatCallback
     public interface SocketCallback {
         //出错
         void onError(Exception e);
@@ -30,7 +30,13 @@
         //连接失败
         void onConnectFail(Socket socket, boolean needReconnect);
         //接收
-        void onReceive(Socket socket, ByteArrayOutputStream byteArray);
+        void onReceive(Socket socket, byte[] bytes);
+    }
+    public interface HeartbeatCallback {
+        //心跳结束
+        void onStopHeartbeat();
+        //准备发送的心跳数据预处理格式定义
+        void onPreSend(DataOutputStream out);
     }
 
 
