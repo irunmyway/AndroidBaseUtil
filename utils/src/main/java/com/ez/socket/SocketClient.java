@@ -1,5 +1,6 @@
 package com.ez.socket;
 
+import com.ez.socket.callback.EmptyCallbackImpl;
 import com.ez.socket.callback.HeartbeatCallback;
 import com.ez.socket.callback.SocketCallback;
 import com.ez.utils.BObject;
@@ -8,6 +9,7 @@ import com.ez.utils.BString;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
@@ -31,9 +33,25 @@ public class SocketClient extends Thread {
     private int maxReceiveMB = 1;//最大接收字节mb
     private HeartbeatClient heartbeatClient;//心跳线程
     private HeartbeatCallback heartbeatCallback;//心跳回调
+    private static SocketClient Instance;//单例模式
+    private long keepAliveDelay;//心跳速率
+    private boolean isExit;//结束标记
+
+    //获取单例
+    public static SocketClient getInstance() {
+        if (Instance == null) {
+            Instance = new SocketClient();
+        }
+        return Instance;
+    }
 
     //设置连接属性
-    public SocketClient createConnection(String target, int port, boolean needReconnect, boolean needHeartbeat) {
+    public SocketClient createConnection(String target, String strPort, boolean needReconnect, boolean needHeartbeat) {
+        int port = 80;
+        try {
+            port = Integer.parseInt(strPort);
+        } catch (Exception e) {
+        }
         this.needReconnect = needReconnect;
         this.needHeartbeat = needHeartbeat;
         if (port < 2) return this;
@@ -45,6 +63,8 @@ public class SocketClient extends Thread {
     //初始化连接
     public void init() {
         try {
+            if (socketCallback == null) socketCallback = new EmptyCallbackImpl();//设置空监听
+            if (heartbeatCallback == null) heartbeatCallback = new EmptyCallbackImpl();//设置空监听
             socket = new Socket();
             socket.connect(address);
             in = new DataInputStream(socket.getInputStream());
@@ -57,11 +77,14 @@ public class SocketClient extends Thread {
                         heartbeatClient = null;
                     }
                     heartbeatClient = new HeartbeatClient();
+                    heartbeatClient.keepAliveDelay = keepAliveDelay;
                     heartbeatClient.createHeatbeat(socket, heartbeatCallback).start();
                 }
             } else {
                 socketCallback.onConnectFail(socket, needReconnect);
             }
+        } catch (ConnectException e3) {
+            socketCallback.onConnectFail(socket, needReconnect);
         } catch (UnknownHostException e1) {
             socketCallback.onError(e1);
         } catch (IOException ex) {
@@ -110,6 +133,7 @@ public class SocketClient extends Thread {
                             socketCallback.onError(e);
                         }
                     } else {
+                        if (needReconnect) reConnect();
                         socketCallback.onClosed(socket);
                     }
                 } else {
@@ -133,7 +157,7 @@ public class SocketClient extends Thread {
                     socket = null;
                     init();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    socketCallback.onError(new Exception("重连失败"));
                 }
             }
         }).start();
@@ -145,24 +169,41 @@ public class SocketClient extends Thread {
         init();
         try {
             byte[] b = new byte[1024 * maxReceiveMB];
-            while (true) {
+            while (!isExit) {
                 if (!socket.isClosed()) {
                     if (socket.isConnected()) {
                         if (!socket.isInputShutdown()) {
                             resetArray(b);
                             in.read(b);
                             if (b[0] != 0) {//有数据接收
-                                socketCallback.onReceive(socket, b);
+                                try {
+                                    socketCallback.onReceive(socket, b);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
                             }
                         }
                     }
                 } else {
+                    if (needReconnect) reConnect();
                     socketCallback.onClosed(socket);
                 }
             }
         } catch (Exception e) {
-            socketCallback.onError(e);
+            if (needReconnect) run();
+            socketCallback.onError(new Exception("监听线程异常结束"));
         }
+    }
+
+    //设置结束套接字
+    public void destroyInstance() {
+        isExit = true;
+        Instance = null;
+    }
+
+    //设置心跳速率
+    public void setHeatbeatDelay(long delay) {
+        keepAliveDelay = delay;
     }
 
     //设置套接字回调
