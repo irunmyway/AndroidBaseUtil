@@ -202,7 +202,7 @@ public class SocketClient extends Thread {
     }
 
     //设置心跳速率
-    public void setHeatbeatDelay(long delay) {
+    public void setHeartbeatDelay(long delay) {
         keepAliveDelay = delay;
     }
 

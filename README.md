@@ -15,9 +15,10 @@
      * 初始化Socket
      */
     private void initSocket() {
-       socketClient = new SocketClient();
-       socketClient.createConnection("111.111.111",9123,true,true);//允许重连 开启心跳
-        socketClient.setHeartbeatCallback(heartbeatCallback).setSocketCallback(socketLitener).start();
+       socketClient = SocketClient.getInstance();//单例模式
+       socketClient.createConnection("111.111.111",9123,true,true);//允许重连 开启心跳socketClient.setHeatbeatDelay(2000);//设置心跳速率
+       socketClient.setHeartbeatDelay(2000);//设置心跳速率
+       socketClient.setHeartbeatCallback(heartbeatCallback).setSocketCallback(socketLitener).start();//设置监听并启动,监听也可以为null。
     }
     //提供如下的监听回调类 :SocketCallback  :HeartbeatCallback
     public interface SocketCallback {
