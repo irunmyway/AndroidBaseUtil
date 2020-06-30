@@ -96,7 +96,11 @@ public class BSql {
                 while (iter.hasNext()) {
                     Object key = iter.next();
                     Object val = condition.get(key);
-                    keyStr = keyStr + (keyStr.length() > 0 ? addStr : "") + key + "=" + "'" + val + "'";
+                    if (val.toString().contains(".")) {//多表联查
+                        keyStr = keyStr + (keyStr.length() > 0 ? addStr : "") + key + "=" + val;
+                    } else {
+                        keyStr = keyStr + (keyStr.length() > 0 ? addStr : "") + key + "=" + "'" + val + "'";
+                    }
                 }
                 order = order + keyStr;
             }
@@ -132,7 +136,11 @@ public class BSql {
                 while (iter.hasNext()) {
                     Object key = iter.next();
                     Object val = condition.get(key);
-                    keyStr = keyStr + (keyStr.length() > 0 ? addStr : "") + key + "=" + "'" + val + "'";
+                    if (val.toString().contains(".")) {//多表联查
+                        keyStr = keyStr + (keyStr.length() > 0 ? addStr : "") + key + "=" + val;
+                    } else {
+                        keyStr = keyStr + (keyStr.length() > 0 ? addStr : "") + key + "=" + "'" + val + "'";
+                    }
                 }
                 order = order + keyStr;
             }
@@ -157,7 +165,11 @@ public class BSql {
                 while (iter.hasNext()) {
                     Object key = iter.next();
                     Object val = condition.get(key);
-                    keyStr = keyStr + (keyStr.length() > 0 ? addStr : "") + key + "=" + "'" + val + "'";
+                    if (val.toString().contains(".")) {//多表联查
+                        keyStr = keyStr + (keyStr.length() > 0 ? addStr : "") + key + "=" + val;
+                    } else {
+                        keyStr = keyStr + (keyStr.length() > 0 ? addStr : "") + key + "=" + "'" + val + "'";
+                    }
                 }
                 order = order + keyStr;
             }

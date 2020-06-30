@@ -136,4 +136,4 @@ allprojects {
 `implementation（或api） 'com.github.irunmyway:AndroidBaseUtil:1.0.0.2'`
 
 AndroidX：
-`implementation（或api） 'com.github.irunmyway:AndroidBaseUtil:2.0.0.5'`
+`implementation（或api） 'com.github.irunmyway:AndroidBaseUtil:2.0.0.7'`
