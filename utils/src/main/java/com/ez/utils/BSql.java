@@ -47,7 +47,6 @@ public class BSql {
                 Object val = values.get(key);
                 keyStr = keyStr + (keyStr.length() > 0 ? "," : "") + key + " " + val;
             }
-
             if (autokey == true) {
                 order = order + "(" + "uid INTEGER PRIMARY KEY AUTOINCREMENT," + keyStr + ")";
             } else {
@@ -81,7 +80,6 @@ public class BSql {
             BDebug.trace("sql createData Error: ", e.getMessage());
             return false;
         }
-
         return true;
     }
 
@@ -104,7 +102,6 @@ public class BSql {
                 }
                 order = order + keyStr;
             }
-
             _db.execSQL(order);
 
         } catch (Exception e) {
@@ -126,7 +123,6 @@ public class BSql {
                 keyStr = keyStr + (keyStr.length() > 0 ? "," : "") + key + "=" + "'" + val + "'";
             }
             order = order + keyStr;
-
 
             keyStr = "";
             String addStr = isAnd == true ? " and " : " or ";
@@ -207,5 +203,59 @@ public class BSql {
             BDebug.trace("sql query Error: ", e.getMessage());
         }
         return list;
+    }
+
+    public static List<Map<String, String>> query(String sql) {
+        List<Map<String, String>> list = null;
+        try {
+            Cursor cursor = _db.rawQuery(sql, null);
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                list = new ArrayList<Map<String, String>>();
+                for (int i = 0; i < cursor.getCount(); i++) {
+                    HashMap<String, String> map = new HashMap<String, String>();
+                    for (int j = 0; j < cursor.getColumnCount(); j++) {
+                        String key = cursor.getColumnName(j);
+                        String val = cursor.getString(j);
+                        map.put(key, val);
+                    }
+                    list.add(map);
+                    cursor.moveToNext();
+                }
+            }
+        } catch (Exception e) {
+            BDebug.trace("sql query Error: ", e.getMessage());
+        }
+        return list;
+    }
+
+    public static boolean update(String sql) {
+        try {
+            _db.execSQL(sql);
+            return true;
+        } catch (Exception e) {
+            BDebug.trace("sql update Error: ", e.getMessage());
+            return false;
+        }
+    }
+
+    public static boolean remove(String sql) {
+        try {
+            _db.execSQL(sql);
+            return true;
+        } catch (Exception e) {
+            BDebug.trace("sql update Error: ", e.getMessage());
+            return false;
+        }
+    }
+
+    public static boolean create(String sql) {
+        try {
+            _db.execSQL(sql);
+            return true;
+        } catch (Exception e) {
+            BDebug.trace("sql update Error: ", e.getMessage());
+            return false;
+        }
     }
 }
