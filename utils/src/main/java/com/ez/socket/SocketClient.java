@@ -29,6 +29,7 @@ public class SocketClient extends Thread {
     private DataOutputStream out = null;
     private SocketCallback socketCallback;//套接字回调
     private boolean needReconnect;//需要重连
+    private long reconnectDelay;
     private boolean needHeartbeat;//需要心跳
     private int maxReceiveMB = 1;//最大接收字节mb
     private HeartbeatClient heartbeatClient;//心跳线程
@@ -46,13 +47,29 @@ public class SocketClient extends Thread {
     }
 
     //设置连接属性
-    public SocketClient createConnection(String target, String strPort, boolean needReconnect, boolean needHeartbeat) {
+    public SocketClient createConnection(String target, String strPort, boolean needHeartbeat) {
         int port = 80;
         try {
             port = Integer.parseInt(strPort);
         } catch (Exception e) {
         }
-        this.needReconnect = needReconnect;
+        this.needReconnect = false;
+        this.needHeartbeat = needHeartbeat;
+        if (port < 2) return this;
+        if (!BString.isIP(target)) return this;
+        address = new InetSocketAddress(target, port);
+        return this;
+    }
+
+    //设置连接属性
+    public SocketClient createConnection(String target, String strPort, long reconnectDelay, boolean needHeartbeat) {
+        int port = 80;
+        try {
+            port = Integer.parseInt(strPort);
+        } catch (Exception e) {
+        }
+        this.needReconnect = true;
+        this.reconnectDelay = reconnectDelay;
         this.needHeartbeat = needHeartbeat;
         if (port < 2) return this;
         if (!BString.isIP(target)) return this;
@@ -149,6 +166,10 @@ public class SocketClient extends Thread {
             @Override
             public void run() {
                 try {
+                    Thread.sleep(reconnectDelay);
+                } catch (InterruptedException e1) {
+                }
+                try {
                     if (BObject.isNotEmpty(in) && BObject.isNotEmpty(out)) {
                         in.close();
                         out.close();
@@ -190,8 +211,16 @@ public class SocketClient extends Thread {
                 }
             }
         } catch (Exception e) {
-            if (needReconnect) run();
-            socketCallback.onError(new Exception("监听线程异常结束"));
+            if (needReconnect) {
+                socketCallback.onError(new Exception("监听线程异常结束,并重连。"));
+                try {
+                    Thread.sleep(reconnectDelay);
+                } catch (InterruptedException e1) {
+                }
+                run();
+            } else {
+                socketCallback.onError(new Exception("监听线程异常结束"));
+            }
         }
     }
 

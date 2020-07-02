@@ -1,9 +1,10 @@
 package com.ez.socket.callback;
 
 import java.io.DataOutputStream;
+import java.net.ServerSocket;
 import java.net.Socket;
 
-public class EmptyCallbackImpl implements SocketCallback, HeartbeatCallback {
+public class EmptyCallbackImpl implements SocketCallback, HeartbeatCallback, SocketServerCallback {
     @Override
     public void onStopHeartbeat() {
 
@@ -20,12 +21,22 @@ public class EmptyCallbackImpl implements SocketCallback, HeartbeatCallback {
     }
 
     @Override
+    public void onClosed(ServerSocket serverSocket) {
+
+    }
+
+    @Override
     public void onClosed(Socket socket) {
 
     }
 
     @Override
     public void onConnected(Socket socket) {
+
+    }
+
+    @Override
+    public void onBuildFail(ServerSocket serverSocket, boolean needReconnect) {
 
     }
 
