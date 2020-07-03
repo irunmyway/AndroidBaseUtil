@@ -38,6 +38,7 @@ public class BSql {
     }
 
     public static boolean createTable(String table, HashMap<String, String> values, boolean autokey) {
+        _db.beginTransaction();
         try {
             String order = "CREATE TABLE IF NOT EXISTS " + table;
             String keyStr = "";
@@ -53,15 +54,19 @@ public class BSql {
                 order = order + "(" + keyStr + ")";
             }
             _db.execSQL(order);
+            _db.setTransactionSuccessful();
         } catch (Exception e) {
             BDebug.trace("sql createTable Error: ", e.getMessage());
             return false;
+        } finally {
+            _db.endTransaction();
         }
 
         return true;
     }
 
     public static boolean createData(String table, HashMap<String, String> values) {
+        _db.beginTransaction();
         try {
             String order = "insert into " + table;
             String keyStr = "";
@@ -74,16 +79,19 @@ public class BSql {
                 valStr = valStr + (valStr.length() > 0 ? "," : "") + "'" + val + "'";
             }
             order = order + "(" + keyStr + ") values " + "(" + valStr + ")";
-
             _db.execSQL(order);
+            _db.setTransactionSuccessful();
         } catch (Exception e) {
             BDebug.trace("sql createData Error: ", e.getMessage());
             return false;
+        } finally {
+            _db.endTransaction();
         }
         return true;
     }
 
     public static boolean removeData(String table, HashMap<String, String> condition, boolean isAnd) {
+        _db.beginTransaction();
         try {
             String addStr = isAnd == true ? " and " : " or ";
             String order = "delete from " + table;
@@ -103,16 +111,19 @@ public class BSql {
                 order = order + keyStr;
             }
             _db.execSQL(order);
-
+            _db.setTransactionSuccessful();
         } catch (Exception e) {
             BDebug.trace("sql removeData Error: ", e.getMessage());
             return false;
+        } finally {
+            _db.endTransaction();
         }
 
         return true;
     }
 
     public static boolean update(String table, HashMap<String, String> values, HashMap<String, String> condition, boolean isAnd) {
+        _db.beginTransaction();
         try {
             String order = "update " + table + " set ";
             String keyStr = "";
@@ -141,9 +152,12 @@ public class BSql {
                 order = order + keyStr;
             }
             _db.execSQL(order);
+            _db.setTransactionSuccessful();
         } catch (Exception e) {
             BDebug.trace("sql update Error: ", e.getMessage());
             return false;
+        } finally {
+            _db.endTransaction();
         }
         return true;
     }
@@ -229,33 +243,17 @@ public class BSql {
         return list;
     }
 
-    public static boolean update(String sql) {
+    public static boolean executeSql(String sql) {
+        _db.beginTransaction();
         try {
             _db.execSQL(sql);
+            _db.setTransactionSuccessful();
             return true;
         } catch (Exception e) {
             BDebug.trace("sql update Error: ", e.getMessage());
             return false;
-        }
-    }
-
-    public static boolean remove(String sql) {
-        try {
-            _db.execSQL(sql);
-            return true;
-        } catch (Exception e) {
-            BDebug.trace("sql update Error: ", e.getMessage());
-            return false;
-        }
-    }
-
-    public static boolean create(String sql) {
-        try {
-            _db.execSQL(sql);
-            return true;
-        } catch (Exception e) {
-            BDebug.trace("sql update Error: ", e.getMessage());
-            return false;
+        } finally {
+            _db.endTransaction();
         }
     }
 }
