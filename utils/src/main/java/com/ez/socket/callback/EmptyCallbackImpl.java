@@ -21,6 +21,11 @@ public class EmptyCallbackImpl implements SocketCallback, HeartbeatCallback, Soc
     }
 
     @Override
+    public void onClosed(ServerSocket serverSocket, Socket socket) {
+
+    }
+
+    @Override
     public void onClosed(ServerSocket serverSocket) {
 
     }
