@@ -28,6 +28,7 @@ public class BSql {
 
     private static SQLiteDatabase _db;
 
+
     public static void create(File f) {
         _db = SQLiteDatabase.openOrCreateDatabase(f, null);
     }

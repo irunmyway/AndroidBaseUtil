@@ -13,7 +13,7 @@ public interface SocketServerCallback {
     void onError(Exception e);
 
     //关闭
-    void onClosed(ServerSocket serverSocket);
+    void onClosed(ServerSocket serverSocket, Socket socket);
 
     //已连接
     void onConnected(Socket socket);

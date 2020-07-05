@@ -456,4 +456,22 @@ public class BString {
         if (!bUpCase) result = Character.toLowerCase(result);
         return result;
     }
+
+    //效验
+    public static boolean isSql(String str) {
+        str = str.toLowerCase();//统一转为小写
+        String badStr = "'|and|exec|execute|insert|select|delete|update|count|drop|*|%|master|truncate|" +
+                "declare|sitename|net user|xp_cmdshell|;|-|+|,|like'|create|" +
+                "table|from|grant|use|group_concat|column_name|" +
+                "information_schema.columns|table_schema|union|where|count|*|" +
+                "master|truncate|declare|;|-|--|+|,|like|//|/|%|#";//过滤掉的sql关键字，可以手动添加
+        String[] badStrs = badStr.split("\\|");
+        for (int i = 0; i < badStrs.length; i++) {
+            if (str.indexOf(badStrs[i]) >= 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

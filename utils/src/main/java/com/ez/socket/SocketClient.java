@@ -61,6 +61,12 @@ public class SocketClient extends Thread {
         return this;
     }
 
+    public SocketClient setNeedReconnect(boolean needReconnect, long delay) {
+        this.needReconnect = needReconnect;
+        this.reconnectDelay = delay;
+        return this;
+    }
+
     //设置连接属性
     public SocketClient createConnection(String target, String strPort, long reconnectDelay, boolean needHeartbeat) {
         int port = 80;
@@ -159,6 +165,7 @@ public class SocketClient extends Thread {
             }
         }).start();
     }
+
 
     //重写连接
     public void reConnect() {

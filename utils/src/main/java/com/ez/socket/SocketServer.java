@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import static com.ez.utils.BArray.resetArray;
+
 /**
  * 作者: hhx QQ1025334900
  * 时间: 2020-07-02 10:03
@@ -123,6 +125,44 @@ public class SocketServer extends Thread {
         return this;
     }
 
+    //发送数据
+    public void sendMsg(final Socket socket, final Object... args) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if (BObject.isEmpty(args)) {
+                    socketServerCallback.onError(new Exception("发送了空的消息。"));
+                    return;
+                }
+                if (socket != null && socket.isConnected()) {
+                    if (!socket.isOutputShutdown()) {
+                        try {
+                            for (int i = 0; i < args.length; i++) {
+                                try {
+                                    Object val = args[i];
+                                    if (val instanceof byte[])
+                                        out.write((byte[]) val);
+                                    if (val instanceof String)
+                                        out.writeChars(val.toString());
+                                } catch (Exception e) {
+                                    socketServerCallback.onError(e);
+                                }
+                            }
+                            out.flush();
+                        } catch (Exception e) {
+                            try {
+                                socket.close();
+                            } catch (IOException ex) {
+                                ex.printStackTrace();
+                            }
+                            socketServerCallback.onError(e);
+                        }
+                    }
+                }
+            }
+        }).start();
+    }
+
     private class HandlerThread implements Runnable {
         private Socket socket;
 
@@ -136,16 +176,22 @@ public class SocketServer extends Thread {
                 byte[] b = new byte[1024 * maxReceiveMB];
                 // 读取客户端数据
                 DataInputStream in = new DataInputStream(socket.getInputStream());
-                in.read(b);
-                if (b[0] != 0) {//有数据接收
-                    try {
-                        socketServerCallback.onReceive(socket, b);
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                while (!socket.isClosed()) {
+                    resetArray(b);
+                    in.read(b);
+                    if (b[0] != 0) {//有数据接收
+                        try {
+                            socketServerCallback.onReceive(socket, b);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        break;
                     }
                 }
                 in.close();
                 b = null;
+                socketServerCallback.onClosed(serverSocket, socket);
             } catch (Exception e) {
                 socketServerCallback.onError(e);
             } finally {
@@ -160,6 +206,5 @@ public class SocketServer extends Thread {
             }
         }
     }
-
 
 }
