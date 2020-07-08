@@ -209,6 +209,8 @@ public class SocketClient extends Thread {
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
+                            } else {
+                                break;
                             }
                         }
                     }
@@ -216,6 +218,14 @@ public class SocketClient extends Thread {
                     if (needReconnect) reConnect();
                     socketCallback.onClosed(socket);
                 }
+            }
+            socketCallback.onClosed(socket);
+            if (needReconnect) {
+                try {
+                    Thread.sleep(reconnectDelay);
+                } catch (InterruptedException e1) {
+                }
+                run();
             }
         } catch (Exception e) {
             if (needReconnect) {
