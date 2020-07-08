@@ -83,6 +83,10 @@ public class SocketClient extends Thread {
         return this;
     }
 
+    public Socket getSocket() {
+        return socket;
+    }
+
     //初始化连接
     public void init() {
         try {
