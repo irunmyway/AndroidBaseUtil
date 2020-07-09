@@ -16,9 +16,11 @@
      */
     private void initSocket() {
        socketClient = SocketClient.getInstance();//单例模式
+       socketClient.setPackageSafety(2);(解决粘包问题模式)为2代表存储报头用到的字节长度，为0则关闭。默认关闭
        socketClient.createConnection("111.111.111",9123,true,true);//允许重连 开启心跳socketClient.setHeatbeatDelay(2000);//设置心跳速率
        socketClient.setHeartbeatDelay(2000);//设置心跳速率
        socketClient.setHeartbeatCallback(heartbeatCallback).setSocketCallback(socketLitener).start();//设置监听并启动,监听也可以为null。
+
     }
     //提供如下的监听回调类 :SocketCallback  :HeartbeatCallback
     public interface SocketCallback {
@@ -136,4 +138,4 @@ allprojects {
 `implementation（或api） 'com.github.irunmyway:AndroidBaseUtil:1.0.0.2'`
 
 AndroidX：
-`implementation（或api） 'com.github.irunmyway:AndroidBaseUtil:2.0.0.7'`
+`implementation（或api） 'com.github.irunmyway:AndroidBaseUtil:2.0.1.4'`

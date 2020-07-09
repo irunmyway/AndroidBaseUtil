@@ -336,4 +336,42 @@ public class BArray {
         return a;
     }
 
+
+    /**
+     * int到byte[] 由几位字节存储
+     */
+    public static byte[] intToByteArray(int i, int byteNum) {
+        byte[] result = new byte[byteNum];
+        //由高位到低位
+        for (int j = byteNum - 1, k = 0; j >= 0; j--, k++) {
+            result[j] = (byte) ((i >> k * 8) & 0xFF);
+        }
+        return result;
+    }
+
+    /**
+     * byte[]转int 由几位字节存储
+     */
+    public static int byteArrayToInt(byte[] bytes, int byteNum) {
+        int value = 0; //由高位到低位
+        for (int i = 0; i < byteNum; i++) {
+            int shift = (byteNum - 1 - i) * 8;
+            value += (bytes[i] & 0x000000FF) << shift;//往高位游
+        }
+        return value;
+    }
+
+    //合并数组
+    public byte[] mergeByte(byte[] a, byte[] b, int begin, int end) {
+        byte[] add = new byte[a.length + end - begin];
+        int i = 0;
+        for (i = 0; i < a.length; i++) {
+            add[i] = a[i];
+        }
+        for (int k = begin; k < end; k++, i++) {
+            add[i] = b[k];
+        }
+        return add;
+    }
+
 }

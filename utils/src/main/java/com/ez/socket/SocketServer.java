@@ -10,7 +10,10 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import static com.ez.utils.BArray.byteArrayToInt;
+import static com.ez.utils.BArray.intToByteArray;
 import static com.ez.utils.BArray.resetArray;
+import static java.lang.System.arraycopy;
 
 /**
  * 作者: hhx QQ1025334900
@@ -29,6 +32,7 @@ public class SocketServer extends Thread {
     private long RebuildDelay;
     private SocketServerCallback socketServerCallback;
     private int maxReceiveMB = 1;//最大接收字节mb
+    private int HEAD_LENGTH = 0;//包头长度存储空间
 
     //获取单例
     public static SocketServer getInstance() {
@@ -126,6 +130,46 @@ public class SocketServer extends Thread {
     }
 
     //发送数据
+    public void sendMsgByLength(final Socket socket, final Object args) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if (BObject.isEmpty(args)) {
+                    socketServerCallback.onError(new Exception("发送了空的消息。"));
+                    return;
+                }
+                if (socket != null && socket.isConnected()) {
+                    if (!socket.isOutputShutdown()) {
+                        try {
+                            try {
+                                if (args instanceof byte[]) {
+                                    out.write(intToByteArray(((byte[]) args).length, HEAD_LENGTH));
+                                    out.write((byte[]) args);
+                                }
+                                if (args instanceof String) {
+                                    out.write(intToByteArray(((String) args).getBytes().length, HEAD_LENGTH));
+                                    out.write(((String) args).getBytes());
+                                }
+                            } catch (Exception e) {
+                                socketServerCallback.onError(e);
+                            }
+                            out.flush();
+                        } catch (Exception e) {
+                            try {
+                                socket.close();
+                            } catch (IOException ex) {
+                                ex.printStackTrace();
+                            }
+                            socketServerCallback.onError(e);
+                        }
+                    }
+                }
+            }
+        }).start();
+    }
+
+
+    //发送数据
     public void sendMsg(final Socket socket, final Object... args) {
         new Thread(new Runnable() {
             @Override
@@ -163,6 +207,11 @@ public class SocketServer extends Thread {
         }).start();
     }
 
+    //设置发包安全 即解决沾包问题
+    public void setPackageSafety(int byteLen) {
+        this.HEAD_LENGTH = byteLen;
+    }
+
     private class HandlerThread implements Runnable {
         private Socket socket;
 
@@ -174,19 +223,46 @@ public class SocketServer extends Thread {
         public void run() {
             try {
                 byte[] b = new byte[1024 * maxReceiveMB];
+                byte[] body = new byte[0];
+                boolean isReceive = false;
+                int curLen = 0;//读取进度
+                int bodyLen = 0;//报文总长
+                byte[] head = new byte[HEAD_LENGTH];
                 // 读取客户端数据
                 DataInputStream in = new DataInputStream(socket.getInputStream());
                 while (!socket.isClosed()) {
-                    resetArray(b);
-                    in.read(b);
-                    if (b[0] != 0) {//有数据接收
-                        try {
-                            socketServerCallback.onReceive(socket, b);
-                        } catch (Exception e) {
-                            e.printStackTrace();
+                    //沾包问题临时解决部分///////////////////////////////////////
+                    if (HEAD_LENGTH > 0) {
+                        if (byteArrayToInt(head, HEAD_LENGTH) < 1) {//还没有读取到包头
+                            int tmpLen = in.read(b, 0, 2);
+                            if (tmpLen > 0) {
+                                arraycopy(b, 0, head, 0, HEAD_LENGTH);
+                                bodyLen = byteArrayToInt(head, HEAD_LENGTH);
+                            }
+                            body = new byte[bodyLen];
+                            isReceive = true;
                         }
-                    } else {
-                        break;
+                        if (isReceive) {
+                            curLen += in.read(body, 0, bodyLen);
+                            if (curLen == bodyLen && curLen != 0) {
+                                socketServerCallback.onReceive(socket, body);
+                                isReceive = false;
+                                curLen = 0;
+                                head = new byte[HEAD_LENGTH];
+                            }
+                        }
+                    } else {//未开启解决沾包
+                        if (b[0] != 0) {//有数据接收
+                            try {
+                                resetArray(b);
+                                in.read(b);
+                                socketServerCallback.onReceive(socket, b);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            break;
+                        }
                     }
                 }
                 in.close();
