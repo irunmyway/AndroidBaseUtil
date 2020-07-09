@@ -141,55 +141,6 @@ public class SocketClient extends Thread {
     }
 
     //发送数据 通过长度包头 可以解决沾包拆包
-    public void sendMsgByLength(final byte[] args) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (BObject.isEmpty(args)) {
-                    socketCallback.onError(new Exception("发送了空的消息。"));
-                    return;
-                }
-                if (socket != null && socket.isConnected()) {
-                    if (!socket.isOutputShutdown()) {
-                        try {
-                            byte[] contentBytes = args;// 包体内容
-                            int contentlength = contentBytes.length;// 包体长度
-                            String head = String.valueOf(contentlength);// 头部内容
-                            byte[] headbytes = head.getBytes();// 头部内容字节数组
-                            byte[] bytes = new byte[headbytes.length + contentlength];// 包=包头+包体
-                            int i = 0;
-                            for (i = 0; i < headbytes.length; i++) {// 包头
-                                bytes[i] = headbytes[i];
-                            }
-                            for (int j = i, k = 0; k < contentlength; k++, j++) {// 包体
-                                bytes[j] = contentBytes[k];
-                            }
-                            try {
-                                out.write(bytes);
-                            } catch (Exception e) {
-                                socketCallback.onError(e);
-                            }
-                            out.flush();
-                        } catch (Exception e) {
-                            try {
-                                socket.close();
-                            } catch (IOException ex) {
-                                ex.printStackTrace();
-                            }
-                            socketCallback.onError(e);
-                        }
-                    } else {
-                        if (needReconnect) reConnect();
-                        socketCallback.onClosed(socket);
-                    }
-                } else {
-                    socketCallback.onConnectFail(socket, needReconnect);
-                }
-            }
-        }).start();
-    }
-
-    //解决沾包拆包
     public void sendMsgByLength(final Object args) {
         new Thread(new Runnable() {
             @Override
