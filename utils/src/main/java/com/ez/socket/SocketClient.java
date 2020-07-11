@@ -39,7 +39,7 @@ public class SocketClient extends Thread {
     private static SocketClient Instance;//单例模式
     private long keepAliveDelay;//心跳速率
     private boolean isExit;//结束标记
-    private int HEAD_LENGTH = 0;//包头长度存储空间
+    private int HEAD_LENGTH = 2;//包头长度存储空间
 
 
     //获取单例
@@ -88,11 +88,10 @@ public class SocketClient extends Thread {
         return this;
     }
 
-    public static byte[] byteMerger(byte[] byte_1, byte[] byte_2) {
-        byte[] byte_3 = new byte[byte_1.length + byte_2.length];
-        System.arraycopy(byte_1, 0, byte_3, 0, byte_1.length);
-        System.arraycopy(byte_2, 0, byte_3, byte_1.length, byte_2.length);
-        return byte_3;
+    public static byte[] subBytes(byte[] src, int begin, int count) {
+        byte[] bs = new byte[count];
+        System.arraycopy(src, begin, bs, 0, count);
+        return bs;
     }
 
     //初始化连接
@@ -135,77 +134,11 @@ public class SocketClient extends Thread {
         return this;
     }
 
-    //获取套接字
-    public Socket getSocket() {
-        return socket;
-    }
-
-    //发送数据 通过长度包头 可以解决沾包拆包
-    public void sendMsgByLength(final Object args) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (BObject.isEmpty(args)) {
-                    socketCallback.onError(new Exception("发送了空的消息。"));
-                    return;
-                }
-                if (socket != null && socket.isConnected()) {
-                    if (!socket.isOutputShutdown()) {
-                        try {
-                            try {
-                                if (args instanceof byte[]) {
-                                    out.write(intToByteArray(((byte[]) args).length, HEAD_LENGTH));
-                                    out.write((byte[]) args);
-                                }
-                                if (args instanceof String) {
-                                    out.write(intToByteArray(((String) args).getBytes().length, HEAD_LENGTH));
-                                    out.write(((String) args).getBytes());
-                                }
-                            } catch (Exception e) {
-                                socketCallback.onError(e);
-                            }
-                            out.flush();
-                        } catch (Exception e) {
-                            try {
-                                socket.close();
-                            } catch (IOException ex) {
-                                ex.printStackTrace();
-                            }
-                            socketCallback.onError(e);
-                        }
-                    } else {
-                        if (needReconnect) reConnect();
-                        socketCallback.onClosed(socket);
-                    }
-                } else {
-                    socketCallback.onConnectFail(socket, needReconnect);
-                }
-            }
-        }).start();
-    }
-
-    //重写连接
-    public void reConnect() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(reconnectDelay);
-                } catch (InterruptedException e1) {
-                }
-                try {
-                    if (BObject.isNotEmpty(in) && BObject.isNotEmpty(out)) {
-                        in.close();
-                        out.close();
-                    }
-                    socket.close();
-                    socket = null;
-                    init();
-                } catch (IOException e) {
-                    socketCallback.onError(new Exception("重连失败"));
-                }
-            }
-        }).start();
+    public static byte[] byteMerger(byte[] byte_1, byte[] byte_2) {
+        byte[] byte_3 = new byte[byte_1.length + byte_2.length];
+        System.arraycopy(byte_1, 0, byte_3, 0, byte_1.length);
+        System.arraycopy(byte_2, 0, byte_3, byte_1.length, byte_2.length);
+        return byte_3;
     }
 
     //普通的发送数据 不能解决沾包拆包
@@ -252,6 +185,79 @@ public class SocketClient extends Thread {
         }).start();
     }
 
+    //获取套接字
+    public Socket getSocket() {
+        return socket;
+    }
+
+    //普通的发送数据 不能解决沾包拆包
+    public void sendMsgByLength(final Object args) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if (BObject.isEmpty(args)) {
+                    socketCallback.onError(new Exception("发送了空的消息。"));
+                    return;
+                }
+                if (socket != null && socket.isConnected()) {
+                    if (!socket.isOutputShutdown()) {
+                        try {
+                            try {
+                                if (args instanceof byte[]) {
+                                    out.write(byteMerger(intToByteArray(((byte[]) args).length, HEAD_LENGTH), (byte[]) args));
+                                }
+                                if (args instanceof String) {
+                                    out.write(byteMerger(intToByteArray(((String) args).getBytes().length, HEAD_LENGTH), ((String) args).getBytes()));
+                                }
+                            } catch (Exception e) {
+                                socketCallback.onError(e);
+                            }
+                            out.flush();
+                        } catch (Exception e) {
+                            try {
+                                socket.close();
+                            } catch (IOException ex) {
+                                ex.printStackTrace();
+                            }
+                            socketCallback.onError(e);
+                        }
+                    } else {
+                        if (needReconnect) reConnect();
+                        socketCallback.onClosed(socket);
+                    }
+                } else {
+                    socketCallback.onConnectFail(socket, needReconnect);
+                }
+            }
+        }).start();
+    }
+
+    //重写连接
+    public void reConnect() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(reconnectDelay);
+                } catch (InterruptedException e1) {
+                }
+                try {
+                    if (BObject.isNotEmpty(in) && BObject.isNotEmpty(out)) {
+                        in.close();
+                        out.close();
+                    }
+                    if (BObject.isNotEmpty(socket)) {
+                        socket.close();
+                        socket = null;
+                    }
+                    init();
+                } catch (IOException e) {
+                    socketCallback.onError(new Exception("重连失败"));
+                }
+            }
+        }).start();
+    }
+
     @Override
     public void run() {
         super.run();
@@ -259,10 +265,10 @@ public class SocketClient extends Thread {
         try {
             byte[] b = new byte[1024 * maxReceiveMB];
             byte[] body = new byte[0];
-            boolean isReceive = false;
+            boolean isReceive = false;//开始接收信息吗
             int curLen = 0;//读取进度
             int bodyLen = 0;//报文总长
-            byte[] head = new byte[HEAD_LENGTH];
+            byte[] head = new byte[HEAD_LENGTH];//头部长度字节集
             while (!isExit) {
                 if (!socket.isClosed()) {
                     if (socket.isConnected()) {
@@ -271,7 +277,9 @@ public class SocketClient extends Thread {
                                 //沾包问题临时解决部分///////////////////////////////////////
                                 if (HEAD_LENGTH > 0) {
                                     if (byteArrayToInt(head, HEAD_LENGTH) < 1) {//还没有读取到包头
-                                        int tmpLen = in.read(b, 0, 2);
+                                        b = new byte[1024 * maxReceiveMB];
+                                        int tmpLen = 0;
+                                        tmpLen = in.read(b, 0, HEAD_LENGTH);
                                         if (tmpLen > 0) {
                                             arraycopy(b, 0, head, 0, HEAD_LENGTH);
                                             bodyLen = byteArrayToInt(head, HEAD_LENGTH);
@@ -280,12 +288,26 @@ public class SocketClient extends Thread {
                                         isReceive = true;
                                     }
                                     if (isReceive) {
-                                        curLen += in.read(body, 0, bodyLen);
-                                        if (curLen == bodyLen && curLen != 0) {
-                                            socketCallback.onReceive(socket, body);
+                                        curLen += in.read(body, curLen, bodyLen - curLen);
+                                        if (curLen == body.length && curLen != 0) {
+                                            try {
+                                                socketCallback.onReceive(socket, body);
+                                            } catch (Exception e) {//如果接收到的包不能被正常解析的话 就跳过
+                                                e.printStackTrace();
+                                                isReceive = false;
+                                                curLen = 0;
+                                                head = new byte[HEAD_LENGTH];
+                                                continue;
+                                            }
                                             isReceive = false;
                                             curLen = 0;
                                             head = new byte[HEAD_LENGTH];
+                                        } else {
+                                            if (curLen == -1) {//断线了
+                                                if (needReconnect) reConnect();
+                                                socketCallback.onClosed(socket);
+                                            }
+                                            continue;
                                         }
                                     }
                                 } else {//未开启解决沾包
@@ -308,8 +330,8 @@ public class SocketClient extends Thread {
                         }
                     }
                 } else {
-                    if (needReconnect) reConnect();
-                    socketCallback.onClosed(socket);
+                    //if (needReconnect) reConnect();
+                    //socketCallback.onClosed(socket);
                 }
             }
             socketCallback.onClosed(socket);
@@ -333,6 +355,7 @@ public class SocketClient extends Thread {
             }
         }
     }
+
     //设置结束套接字
     public void destroyInstance() {
         isExit = true;

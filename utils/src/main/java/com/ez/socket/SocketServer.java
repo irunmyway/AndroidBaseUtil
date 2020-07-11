@@ -234,7 +234,7 @@ public class SocketServer extends Thread {
                     //沾包问题临时解决部分///////////////////////////////////////
                     if (HEAD_LENGTH > 0) {
                         if (byteArrayToInt(head, HEAD_LENGTH) < 1) {//还没有读取到包头
-                            int tmpLen = in.read(b, 0, 2);
+                            int tmpLen = in.read(b, 0, HEAD_LENGTH);
                             if (tmpLen > 0) {
                                 arraycopy(b, 0, head, 0, HEAD_LENGTH);
                                 bodyLen = byteArrayToInt(head, HEAD_LENGTH);
@@ -243,12 +243,15 @@ public class SocketServer extends Thread {
                             isReceive = true;
                         }
                         if (isReceive) {
-                            curLen += in.read(body, 0, bodyLen);
+                            curLen += in.read(body, curLen, bodyLen - curLen);
                             if (curLen == bodyLen && curLen != 0) {
                                 socketServerCallback.onReceive(socket, body);
                                 isReceive = false;
                                 curLen = 0;
                                 head = new byte[HEAD_LENGTH];
+                            } else {
+                                //BDebug.trace("测试"+"关闭了");
+                                break;
                             }
                         }
                     } else {//未开启解决沾包
